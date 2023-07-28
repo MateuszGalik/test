@@ -20,4 +20,6 @@ step = 0.02
 X = torch.arange(start, end, step).unsqueeze(dim=1)
 # print(X)
 y = weight * X + bias
-print(f"{X[:5]}, {y[:5]}")
+# print(f"{X[:5]}, {y[:5]}")
+
+# TODO (create model, and plot)

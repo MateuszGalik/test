@@ -1,12 +1,15 @@
 import pandas as pd
 # print(pd.__version__)
 
-CSV_FILE_LINK = "https://www.multipasko.pl/wyniki-csv.php?f=minilotto-sortowane"
-data = pd.read_csv(CSV_FILE_LINK, delimiter=';')
+URL = "https://www.multipasko.pl/wyniki-csv.php?f=minilotto-sortowane"
+data = pd.read_csv(URL, delimiter=';')
+data.to_csv('all_data.csv')
 # print(data.tail(5))
 data = data.tail(100)
-data_L1 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L2', 'L3', 'L4', 'L5'])
-data_L1 = data_L1.rename(columns={'Dzien': 'X', 'L1': 'y'})
+# data_L1 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L2', 'L3', 'L4', 'L5'])
+# data_L1 = data_L1.rename(columns={'Dzien': 'X', 'L1': 'y'})
+# data_L1 = data_L1.rename(columns={'L1': 'y'})
+data_L1 = data.drop(columns=['Numer', 'Dzien', 'Miesiac', 'Rok'])
 # data_L2 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L1', 'L3', 'L4', 'L5'])
 # data_L3 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L1', 'L2', 'L4', 'L5'])
 # data_L4 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L1', 'L2', 'L3', 'L5'])

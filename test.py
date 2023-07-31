@@ -56,16 +56,20 @@ class TestModel(torch.nn.Module):
 
     def __init__(self):
         super(TestModel, self).__init__()
-        self.linear1 = torch.nn.Linear(1, 20)
-        self.activation = torch.nn.ReLU()
-        self.linear2 = torch.nn.Linear(20, 1)
-        self.softmax = torch.nn.Softmax()
+        self.linear1 = torch.nn.Linear(1, 50)
+        self.activation1 = torch.nn.SELU()
+        self.linear2 = torch.nn.Linear(50, 50)
+        self.activation2 = torch.nn.SELU()
+        self.linear3 = torch.nn.Linear(50, 1)
+        self.activation3 = torch.nn.ReLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.linear1(x)
-        x = self.activation(x)
+        x = self.activation1(x)
         x = self.linear2(x)
-        x = self.softmax(x)
+        x = self.activation2(x)
+        x = self.linear3(x)
+        x = self.activation3(x)
         return x
 
 
@@ -97,9 +101,25 @@ class LinearRegressionModel2(nn.Module):
         return self.weights * x + self.bias
 
 
+class NoLinearModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layer_1 = nn.Linear(in_features=1, out_features=25)
+        self.layer_2 = nn.Linear(in_features=25, out_features=25)
+        self.layer_3 = nn.Linear(in_features=25, out_features=10)
+        self.layer_4 = nn.Linear(in_features=10, out_features=1)
+        # self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        return self.layer_4(self.sigmoid(self.layer_3(self.sigmoid(self.layer_2(self.sigmoid(self.layer_1(x)))))))
+
+
 torch.manual_seed(42)
 # model_0 = LinearRegressionModel()
-model_0 = TestModel()
+# model_0 = TestModel()
+model_0 = NoLinearModel()
+
 print(list(model_0.parameters()))
 
 # Make predictions with model

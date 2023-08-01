@@ -10,3 +10,6 @@ Prepare data and visualization,matplotlib
 31.07.2023
 Learn how to build model's
 
+01.08.2023
+testing all loss functions from pytorch documentation
+https://pytorch.org/docs/stable/nn.html#loss-functions

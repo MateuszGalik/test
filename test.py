@@ -51,33 +51,6 @@ def plot_predictions(train_data=X_train,
 
 
 # plot_predictions()
-
-class TestModel(torch.nn.Module):
-
-    def __init__(self):
-        super(TestModel, self).__init__()
-        self.linear1 = torch.nn.Linear(1, 50)
-        self.activation1 = torch.nn.SELU()
-        self.linear2 = torch.nn.Linear(50, 50)
-        self.activation2 = torch.nn.SELU()
-        self.linear3 = torch.nn.Linear(50, 1)
-        self.activation3 = torch.nn.ReLU()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.linear1(x)
-        x = self.activation1(x)
-        x = self.linear2(x)
-        x = self.activation2(x)
-        x = self.linear3(x)
-        x = self.activation3(x)
-        return x
-
-
-# print('The model:')
-# print(test_model)
-
-
-# Create a Linear Regression model class
 class LinearRegressionModel(nn.Module):
     # <- almost everything in PyTorch is a nn.Module (think of this as neural network lego blocks)
     def __init__(self):
@@ -116,11 +89,12 @@ class NoLinearModel(nn.Module):
 
 
 torch.manual_seed(42)
-# model_0 = LinearRegressionModel()
-# model_0 = TestModel()
+
 model_0 = NoLinearModel()
 
-print(list(model_0.parameters()))
+# print("### Model 0 Parameters")
+# print(list(model_0.parameters()))
+# print(model_0.state_dict())
 
 # Make predictions with model
 with torch.inference_mode():
@@ -129,7 +103,27 @@ with torch.inference_mode():
 plot_predictions(predictions=y_preds)
 
 # Create the loss function
-loss_fn = nn.L1Loss()
+# loss_fn = nn.L1Loss() # train loss 4.06, test loss 3.8
+# loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
+# loss_fn = nn.CrossEntropyLoss() # train loss 0.0, test loss 0.0
+# loss_fn = nn.CTCLoss() # lack of parameters
+# loss_fn = nn.NLLLoss() # lack of parameters
+# loss_fn = nn.PoissonNLLLoss() # train loss -6.4, test loss -6.7
+# loss_fn = nn.GaussianNLLLoss() # lack of parameters
+# loss_fn =  nn.KLDivLoss() # train loss -4674, test loss -4762
+# loss_fn = nn.BCELoss() # lack of parameters
+# loss_fn = nn.BCEWithLogitsLoss() # train loss -3428, test loss -3503
+# loss_fn = nn.MarginRankingLoss() # lack of parameters
+# loss_fn = nn.HingeEmbeddingLoss() # train loss 0.36, test loss 0.37
+# loss_fn = nn.MultiLabelMarginLoss() # lack of parameters
+# loss_fn = nn.HuberLoss() # train loss 3.5, test loss 3.4
+# loss_fn = nn.SmoothL1Loss() # train loss 3.5, test loss 3.4
+loss_fn = nn.SoftMarginLoss() # train los 0.01, test loss 0.01
+# loss_fm = nn.MultiLabelSoftMarginLoss() # lack of parameters
+# loss_fm = nn.CosineEmbeddingLoss() # lack of parameters
+# loss_fn = nn.MultiMarginLoss() # lack of parameters
+# loss_fn = nn.TripletMarginLoss() # lack of parameters
+# less_fn = nn.TripletMarginWithDistanceLoss() # lack of parameters
 
 # Create the optimizer
 optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.01)

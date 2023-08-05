@@ -13,15 +13,15 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # Import X and y from csv files
 X = torch.from_numpy(np.genfromtxt("results_X.csv", delimiter=",", dtype="float32")).unsqueeze(dim=1)
 y = torch.from_numpy((np.genfromtxt("results_y.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
-print(X[:5], y[:5])
-print(X.shape, y.shape)
+# print(X[:5], y[:5])
+# print(X.shape, y.shape)
 
 # Prepare train data and test data
 train_split = int(0.8 * len(X))  # 80% od data used for training set, 20% for testing
 # print(f"{train_split}")
 X_train, y_train = X[:train_split], y[:train_split]
 X_test, y_test = X[train_split:], y[train_split:]
-print(f"{len(X_train)}, {len(y_train)}, {len(X_test)}, {len(y_test)}")
+# print(f"{len(X_train)}, {len(y_train)}, {len(X_test)}, {len(y_test)}")
 
 
 def plot_predictions(train_data=X_train,
@@ -63,6 +63,17 @@ class LinearRegressionModel(nn.Module):
         return self.linear_layer(x)
 
 
+m = nn.Linear(20, 30)
+inputL = torch.randn(128, 20)
+outputL = m(inputL)
+print(outputL.size())
+
+rnn = nn.RNN(10, 20, 2)
+inputR = torch.randn(5, 3, 10)
+h0 = torch.randn(2, 3, 20)
+outputR, hn = rnn(inputR, h0)
+print(outputR.size())
+
 class LinearRegressionModel2(nn.Module):
     def __init__(self):
         super().__init__()
@@ -79,16 +90,54 @@ class NoLinearModel(nn.Module):
         super().__init__()
         self.layer_1 = nn.Linear(in_features=1, out_features=25)
         self.layer_2 = nn.Linear(in_features=25, out_features=25)
-        self.layer_3 = nn.Linear(in_features=25, out_features=10)
-        self.layer_4 = nn.Linear(in_features=10, out_features=1)
+        self.layer_3 = nn.Linear(in_features=25, out_features=25)
+        self.layer_4 = nn.Linear(in_features=25, out_features=25)
+        self.layer_5 = nn.Linear(in_features=25, out_features=1)
         # self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        return self.layer_4(self.sigmoid(self.layer_3(self.sigmoid(self.layer_2(self.sigmoid(self.layer_1(x)))))))
+        return self.sigmoid(self.layer_5(self.layer_4(self.layer_3(self.layer_2(self.layer_1(x))))))
+
+
+class NoLinearModel2(nn.Module):
+    def __init__(self, input_size, output_size, hidden_dim, n_layers):
+        super(NoLinearModel2, self).__init__()
+
+        # Defining some parameters
+        self.hidden_dim = hidden_dim
+        self.n_layers = n_layers
+
+        # Defining the layers
+        # RNN Layer
+        self.rnn = nn.RNN(input_size, hidden_dim, n_layers, batch_first=True)
+        # Fully connected layer
+        self.fc = nn.Linear(hidden_dim, output_size)
+
+    def forward(self, x):
+        batch_size = x.size(0)
+
+        # Initializing hidden state for first input using method defined below
+        hidden = self.init_hidden(batch_size)
+
+        # Passing in the input and hidden state into the model and obtaining outputs
+        out, hidden = self.rnn(x, hidden)
+
+        # Reshaping the outputs such that it can be fit into the fully connected layer
+        out = out.contiguous().view(-1, self.hidden_dim)
+        out = self.fc(out)
+
+        return out, hidden
+
+    def init_hidden(self, batch_size):
+        # This method generates the first hidden state of zeros which we'll use in the forward pass
+        # We'll send the tensor holding the hidden state to the device we specified earlier as well
+        hidden = torch.zeros(self.n_layers, batch_size, self.hidden_dim)
+        return hidden
 
 
 torch.manual_seed(42)
+
 
 model_0 = NoLinearModel()
 
@@ -96,14 +145,17 @@ model_0 = NoLinearModel()
 # print(list(model_0.parameters()))
 # print(model_0.state_dict())
 
+
 # Make predictions with model
 with torch.inference_mode():
+    # y_preds = model_0(X_test)
     y_preds = model_0(X_test)
+    # y_preds = y[train_split:]
 
 plot_predictions(predictions=y_preds)
 
 # Create the loss function
-# loss_fn = nn.L1Loss() # train loss 4.06, test loss 3.8
+loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
 # loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
 # loss_fn = nn.CrossEntropyLoss() # train loss 0.0, test loss 0.0
 # loss_fn = nn.CTCLoss() # lack of parameters
@@ -118,7 +170,7 @@ plot_predictions(predictions=y_preds)
 # loss_fn = nn.MultiLabelMarginLoss() # lack of parameters
 # loss_fn = nn.HuberLoss() # train loss 3.5, test loss 3.4
 # loss_fn = nn.SmoothL1Loss() # train loss 3.5, test loss 3.4
-loss_fn = nn.SoftMarginLoss() # train los 0.01, test loss 0.01
+# loss_fn = nn.SoftMarginLoss() # train los 0.01, test loss 0.01
 # loss_fm = nn.MultiLabelSoftMarginLoss() # lack of parameters
 # loss_fm = nn.CosineEmbeddingLoss() # lack of parameters
 # loss_fn = nn.MultiMarginLoss() # lack of parameters

@@ -21,6 +21,7 @@ train_split = int(0.8 * len(X))  # 80% od data used for training set, 20% for te
 # print(f"{train_split}")
 X_train, y_train = X[:train_split], y[:train_split]
 X_test, y_test = X[train_split:], y[train_split:]
+# print(X_test, X_train)
 # print(f"{len(X_train)}, {len(y_train)}, {len(X_test)}, {len(y_test)}")
 
 
@@ -63,16 +64,33 @@ class LinearRegressionModel(nn.Module):
         return self.linear_layer(x)
 
 
-m = nn.Linear(20, 30)
-inputL = torch.randn(128, 20)
-outputL = m(inputL)
-print(outputL.size())
+# randomtest = torch.randn(2, 3 , 4)
+# print(f"Random Test: {randomtest[:5]}")
+#
+# m = nn.Linear(1, 2)
+# inputL = torch.randn(128, 1)
+# outputL = m(inputL)
+# print(outputL.size())
+#
+# print(X_test.size())
+# rnn = nn.RNN(1, 200, 1)
+# inputR = torch.randn(200, 1)
+# print(f"InputR size: {inputR.size()}")
+# # print(f"InputR: {inputR}")
+# h0 = torch.randn(1, 200)
+# print(f"h0: {h0}")
+# outputR, hn = rnn(inputR, h0)
+# print(f"Output size{outputR.size()}, Hn size: {hn.size()}")
+# print(outputR)
 
-rnn = nn.RNN(10, 20, 2)
-inputR = torch.randn(5, 3, 10)
-h0 = torch.randn(2, 3, 20)
-outputR, hn = rnn(inputR, h0)
-print(outputR.size())
+# Ploting know x and random y  to yn
+# import torch
+# import matplotlib.pyplot as plt
+# x = torch.arange(start=0, end=200, step=1)
+# y = torch.randn(200, 3)
+# torch.Tensor.ndim = property(lambda self: len(self.shape))  # Fix it
+# plt.plot(x, y)  # Works now
+# plt.show()
 
 class LinearRegressionModel2(nn.Module):
     def __init__(self):
@@ -138,20 +156,19 @@ class NoLinearModel2(nn.Module):
 
 torch.manual_seed(42)
 
-
-model_0 = NoLinearModel()
+model_0 = NoLinearModel2(input_size=1, output_size=1, hidden_dim=200, n_layers=1)
 
 # print("### Model 0 Parameters")
 # print(list(model_0.parameters()))
 # print(model_0.state_dict())
-
+# print(X_test.T.size())
 
 # Make predictions with model
 with torch.inference_mode():
+    y_preds, hn = model_0(X_test.unsqueeze(dim=1))
     # y_preds = model_0(X_test)
-    y_preds = model_0(X_test)
     # y_preds = y[train_split:]
-
+print(y_preds)
 plot_predictions(predictions=y_preds)
 
 # Create the loss function
@@ -197,7 +214,8 @@ for epoch in range(epochs):
     model_0.train()
 
     # 1. Forward pass on train data using the forward() method inside
-    y_pred = model_0(X_train)
+    # y_pred = model_0(X_train)
+    y_pred, hn = model_0(X_train.unsqueeze(dim=1))
     # print(y_pred)
 
     # 2. Calculate the loss (how different are our models predictions to the ground truth)
@@ -220,7 +238,7 @@ for epoch in range(epochs):
     with torch.inference_mode():
 
         # 1. Forward pass on test data
-        test_pred = model_0(X_test)
+        test_pred, hnt = model_0(X_test.unsqueeze(dim=1))
 
         # 2. Caculate loss on test data
         test_loss = loss_fn(test_pred, y_test.type(torch.float))

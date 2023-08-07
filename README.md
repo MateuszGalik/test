@@ -16,3 +16,7 @@ https://pytorch.org/docs/stable/nn.html#loss-functions
 
 05.08.2023
 Trying to understand differences between nn.Linear and nn.RNN
+
+07.08.2023
+My laptop died after setting 5 hidden layers in RNN network model.
+No progress in numbers.

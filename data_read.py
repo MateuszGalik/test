@@ -3,10 +3,10 @@ import pandas as pd
 
 URL = "https://www.multipasko.pl/wyniki-csv.php?f=minilotto-sortowane"
 data = pd.read_csv(URL, delimiter=';')
-data = data.tail(1000)
+data = data.tail(100)
 data.to_csv('all_data.csv')
 # print(data.tail(5))
-data = data.tail(1000)
+data = data.tail(100)
 # data_L1 = data.drop(columns=['Numer', 'Miesiac', 'Rok', 'L2', 'L3', 'L4', 'L5'])
 # data_L1 = data_L1.rename(columns={'Dzien': 'X', 'L1': 'y'})
 # data_L1 = data_L1.rename(columns={'L1': 'y'})

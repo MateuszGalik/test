@@ -13,15 +13,17 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # Import X and y from csv files
 X = torch.from_numpy(np.genfromtxt("results_X.csv", delimiter=",", dtype="float32")).unsqueeze(dim=1)
 y = torch.from_numpy((np.genfromtxt("results_y.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
-# print(X[:5], y[:5])
+print(X[:5], y[:5])
 # print(X.shape, y.shape)
 
 # Prepare train data and test data
 train_split = int(0.8 * len(X))  # 80% od data used for training set, 20% for testing
 # print(f"{train_split}")
 X_train, y_train = X[:train_split], y[:train_split]
+X_train = X_train/6000
 X_test, y_test = X[train_split:], y[train_split:]
-# print(X_test, X_train)
+X_test = X_test/6000
+print(X_test[:5], X_train[:5])
 # print(f"{len(X_train)}, {len(y_train)}, {len(X_test)}, {len(y_test)}")
 
 
@@ -50,113 +52,139 @@ def plot_predictions(train_data=X_train,
     plt.legend(prop={"size": 10})
     plt.show()
 
-
-# plot_predictions()
-class LinearRegressionModel(nn.Module):
-    # <- almost everything in PyTorch is a nn.Module (think of this as neural network lego blocks)
-    def __init__(self):
-        super().__init__()
-        # Use nn.Linear() for creating the model parameters
-        self.linear_layer = nn.Linear(in_features=1, out_features=1,)
-
-    # Define the forward computation (input data x flows through nn.Linear())
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.linear_layer(x)
-
-
-# randomtest = torch.randn(2, 3 , 4)
-# print(f"Random Test: {randomtest[:5]}")
+# ########################################################################################################
+# # plot_predictions()
+#         return self.linear_layer(x)
 #
-# m = nn.Linear(1, 2)
-# inputL = torch.randn(128, 1)
-# outputL = m(inputL)
-# print(outputL.size())
 #
-# print(X_test.size())
-# rnn = nn.RNN(1, 200, 1)
-# inputR = torch.randn(200, 1)
-# print(f"InputR size: {inputR.size()}")
-# # print(f"InputR: {inputR}")
-# h0 = torch.randn(1, 200)
-# print(f"h0: {h0}")
-# outputR, hn = rnn(inputR, h0)
-# print(f"Output size{outputR.size()}, Hn size: {hn.size()}")
-# print(outputR)
-
-# Ploting know x and random y  to yn
-# import torch
-# import matplotlib.pyplot as plt
-# x = torch.arange(start=0, end=200, step=1)
-# y = torch.randn(200, 3)
-# torch.Tensor.ndim = property(lambda self: len(self.shape))  # Fix it
-# plt.plot(x, y)  # Works now
-# plt.show()
-
-class LinearRegressionModel2(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.weights = nn.Parameter(torch.randn(1, dtype=torch.float), requires_grad=True)
-        self.bias = nn.Parameter(torch.randn(1, dtype=torch.float), requires_grad=True)
-
-    # Forward defines the computation in the model
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.weights * x + self.bias
-
-
+# class LinearRegressionModel(nn.Module):
+#     # <- almost everything in PyTorch is a nn.Module (think of this as neural network lego blocks)
+#     def __init__(self):
+#         super().__init__()
+#         # Use nn.Linear() for creating the model parameters
+#         self.linear_layer = nn.Linear(in_features=1, out_features=1,)
+#
+#     # Define the forward computation (input data x flows through nn.Linear())
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+# # randomtest = torch.randn(2, 3 , 4)
+# # print(f"Random Test: {randomtest[:5]}")
+# #
+# # m = nn.Linear(1, 2)
+# # inputL = torch.randn(128, 1)
+# # outputL = m(inputL)
+# # print(outputL.size())
+# #
+# # print(X_test.size())
+# # rnn = nn.RNN(1, 200, 1)
+# # inputR = torch.randn(200, 1)
+# # print(f"InputR size: {inputR.size()}")
+# # # print(f"InputR: {inputR}")
+# # h0 = torch.randn(1, 200)
+# # print(f"h0: {h0}")
+# # outputR, hn = rnn(inputR, h0)
+# # print(f"Output size{outputR.size()}, Hn size: {hn.size()}")
+# # print(outputR)
+#
+# # Ploting know x and random y  to yn
+# # import torch
+# # import matplotlib.pyplot as plt
+# # x = torch.arange(start=0, end=200, step=1)
+# # y = torch.randn(200, 3)
+# # torch.Tensor.ndim = property(lambda self: len(self.shape))  # Fix it
+# # plt.plot(x, y)  # Works now
+# # plt.show()
+#
+# class LinearRegressionModel2(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+#         self.weights = nn.Parameter(torch.randn(1, dtype=torch.float), requires_grad=True)
+#         self.bias = nn.Parameter(torch.randn(1, dtype=torch.float), requires_grad=True)
+#
+#     # Forward defines the computation in the model
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         return self.weights * x + self.bias
+#
+#
 class NoLinearModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.layer_1 = nn.Linear(in_features=1, out_features=25)
-        self.layer_2 = nn.Linear(in_features=25, out_features=25)
-        self.layer_3 = nn.Linear(in_features=25, out_features=25)
-        self.layer_4 = nn.Linear(in_features=25, out_features=25)
-        self.layer_5 = nn.Linear(in_features=25, out_features=1)
-        # self.relu = nn.ReLU()
+        self.lstm = nn.LSTM(input_size=1, hidden_size=25)
+        self.layer_2 = nn.Linear(in_features=25, out_features=1)
+        self.lstm2 = nn.LSTM(input_size=1, hidden_size=25)
+        self.layer_3 = nn.Linear(in_features=25, out_features=1)
+        # self.layer_4 = nn.Linear(in_features=25, out_features=25)
+        # self.layer_5 = nn.Linear(in_features=25, out_features=1)
+        self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        return self.sigmoid(self.layer_5(self.layer_4(self.layer_3(self.layer_2(self.layer_1(x))))))
+        # return self.sigmoid(self.layer_5(self.layer_4(self.layer_3(self.layer_2(self.layer_1(x))))))
+        x, _ = self.lstm(x)
+        x = self.sigmoid(self.layer_2(x))
+        x, _ = self.lstm2(x)
+        x = self.layer_3(x)
+        return x
+#
+#
+# class NoLinearModel2(nn.Module):
+#     def __init__(self, input_size, output_size, hidden_dim, n_layers):
+#         super(NoLinearModel2, self).__init__()
+#
+#         # Defining some parameters
+#         self.hidden_dim = hidden_dim
+#         self.n_layers = n_layers
+#
+#         # Defining the layers
+#         # RNN Layer
+#         self.rnn = nn.RNN(input_size, hidden_dim, n_layers, batch_first=True)
+#         # Fully connected layer
+#         self.fc = nn.Linear(hidden_dim, output_size)
+#
+#     def forward(self, x):
+#         batch_size = x.size(0)
+#
+#         # Initializing hidden state for first input using method defined below
+#         hidden = self.init_hidden(batch_size)
+#
+#         # Passing in the input and hidden state into the model and obtaining outputs
+#         out, hidden = self.rnn(x, hidden)
+#
+#         # Reshaping the outputs such that it can be fit into the fully connected layer
+#         out = out.contiguous().view(-1, self.hidden_dim)
+#         out = self.fc(out)
+#
+#         return out, hidden
+#
+#     def init_hidden(self, batch_size):
+#         # This method generates the first hidden state of zeros which we'll use in the forward pass
+#         # We'll send the tensor holding the hidden state to the device we specified earlier as well
+#         hidden = torch.zeros(self.n_layers, batch_size, self.hidden_dim)
+#         return hidden
+
+#############################################################################################
+
+# Define the model
 
 
-class NoLinearModel2(nn.Module):
-    def __init__(self, input_size, output_size, hidden_dim, n_layers):
-        super(NoLinearModel2, self).__init__()
-
-        # Defining some parameters
-        self.hidden_dim = hidden_dim
-        self.n_layers = n_layers
-
-        # Defining the layers
-        # RNN Layer
-        self.rnn = nn.RNN(input_size, hidden_dim, n_layers, batch_first=True)
-        # Fully connected layer
-        self.fc = nn.Linear(hidden_dim, output_size)
+class LSTMmodel(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(LSTMmodel, self).__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size)
+        self.fc = nn.Linear(hidden_size, output_size)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
-        batch_size = x.size(0)
-
-        # Initializing hidden state for first input using method defined below
-        hidden = self.init_hidden(batch_size)
-
-        # Passing in the input and hidden state into the model and obtaining outputs
-        out, hidden = self.rnn(x, hidden)
-
-        # Reshaping the outputs such that it can be fit into the fully connected layer
-        out = out.contiguous().view(-1, self.hidden_dim)
-        out = self.fc(out)
-
-        return out, hidden
-
-    def init_hidden(self, batch_size):
-        # This method generates the first hidden state of zeros which we'll use in the forward pass
-        # We'll send the tensor holding the hidden state to the device we specified earlier as well
-        hidden = torch.zeros(self.n_layers, batch_size, self.hidden_dim)
-        return hidden
+        x, _ = self.lstm(x)
+        x = self.fc(x)
+        return x
 
 
 torch.manual_seed(42)
 
-model_0 = NoLinearModel2(input_size=1, output_size=1, hidden_dim=200, n_layers=1)
+# model_0 = NoLinearModel2(input_size=1, output_size=1, hidden_dim=200, n_layers=1)
+# model_0 = LSTMmodel(1, 32, 1)
+model_0 = NoLinearModel()
 
 # print("### Model 0 Parameters")
 # print(list(model_0.parameters()))
@@ -165,15 +193,15 @@ model_0 = NoLinearModel2(input_size=1, output_size=1, hidden_dim=200, n_layers=1
 
 # Make predictions with model
 with torch.inference_mode():
-    y_preds, hn = model_0(X_test.unsqueeze(dim=1))
-    # y_preds = model_0(X_test)
+    # y_preds, hn = model_0(X_test.unsqueeze(dim=1))
+    y_preds = model_0(X_test)
     # y_preds = y[train_split:]
 print(y_preds)
 plot_predictions(predictions=y_preds)
 
 # Create the loss function
-loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
-# loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
+# loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
+loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
 # loss_fn = nn.CrossEntropyLoss() # train loss 0.0, test loss 0.0
 # loss_fn = nn.CTCLoss() # lack of parameters
 # loss_fn = nn.NLLLoss() # lack of parameters
@@ -195,8 +223,9 @@ loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
 # less_fn = nn.TripletMarginWithDistanceLoss() # lack of parameters
 
 # Create the optimizer
-optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.01)
-
+# optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.01)
+# optimizer = torch.optim.SGD(model_0.parameters(), lr=0.01, momentum=0.9)
+# optimizer = torch.optim.Adam(model_0.parameters())
 torch.manual_seed(42)
 
 # Set the number of epochs (how many times the model will pass over the training data)
@@ -214,8 +243,8 @@ for epoch in range(epochs):
     model_0.train()
 
     # 1. Forward pass on train data using the forward() method inside
-    # y_pred = model_0(X_train)
-    y_pred, hn = model_0(X_train.unsqueeze(dim=1))
+    y_pred = model_0(X_train)
+    # y_pred, hn = model_0(X_train.unsqueeze(dim=1))
     # print(y_pred)
 
     # 2. Calculate the loss (how different are our models predictions to the ground truth)
@@ -238,7 +267,9 @@ for epoch in range(epochs):
     with torch.inference_mode():
 
         # 1. Forward pass on test data
-        test_pred, hnt = model_0(X_test.unsqueeze(dim=1))
+        # test_pred, hnt = model_0(X_test.unsqueeze(dim=1))
+        test_pred = model_0(X_test)
+
 
         # 2. Caculate loss on test data
         test_loss = loss_fn(test_pred, y_test.type(torch.float))
@@ -249,6 +280,13 @@ for epoch in range(epochs):
             train_loss_values.append(loss.detach().numpy())
             test_loss_values.append(test_loss.detach().numpy())
             print(f"Epoch: {epoch} | MAE Train Loss: {loss} | MAE Test Loss: {test_loss} ")
+
+# Use the model to make predictions
+# input_sequence = torch.Tensor(list(range(10, 20))).view(10, 1, -1)
+input_sequence = torch.Tensor(X_test)
+output = model_0(input_sequence)
+prediction = output[-1].item()
+print(f'Predicted next number: {prediction:.2f}')
 
 # Plot the loss curves
 plt.plot(epoch_count, train_loss_values, label="Train loss")

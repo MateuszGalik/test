@@ -225,7 +225,7 @@ loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
 # Create the optimizer
 # optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.01)
 # optimizer = torch.optim.SGD(model_0.parameters(), lr=0.01, momentum=0.9)
-# optimizer = torch.optim.Adam(model_0.parameters())
+optimizer = torch.optim.Adam(model_0.parameters())
 torch.manual_seed(42)
 
 # Set the number of epochs (how many times the model will pass over the training data)

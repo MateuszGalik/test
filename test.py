@@ -12,44 +12,92 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Import X and y from csv files
 X = torch.from_numpy(np.genfromtxt("results_X.csv", delimiter=",", dtype="float32")).unsqueeze(dim=1)
-y = torch.from_numpy((np.genfromtxt("results_y.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
-print(X[:5], y[:5])
+y_L1 = torch.from_numpy((np.genfromtxt("results_y_L1.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
+y_L2 = torch.from_numpy((np.genfromtxt("results_y_L2.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
+y_L3 = torch.from_numpy((np.genfromtxt("results_y_L3.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
+y_L4 = torch.from_numpy((np.genfromtxt("results_y_L4.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
+y_L5 = torch.from_numpy((np.genfromtxt("results_y_L5.csv", delimiter=",", dtype="float32"))).unsqueeze(dim=1)
+
+# print(X[3:], y_L1[:3], y_L2[:3], y_L3[:3], y_L4[:3], y_L5[:3])
 # print(X.shape, y.shape)
 
 # Prepare train data and test data
 train_split = int(0.8 * len(X))  # 80% od data used for training set, 20% for testing
 # print(f"{train_split}")
-X_train, y_train = X[:train_split], y[:train_split]
+X_train = X[:train_split]
+y_L1_train = y_L1[:train_split]
+y_L2_train = y_L2[:train_split]
+y_L3_train = y_L3[:train_split]
+y_L4_train = y_L4[:train_split]
+y_L5_train = y_L5[:train_split]
+
 X_train = X_train/6000
-X_test, y_test = X[train_split:], y[train_split:]
+X_test = X[train_split:]
 X_test = X_test/6000
-print(X_test[:5], X_train[:5])
+y_L1_test = y_L1[train_split:]
+y_L2_test = y_L2[train_split:]
+y_L3_test = y_L3[train_split:]
+y_L4_test = y_L4[train_split:]
+y_L5_test = y_L5[train_split:]
+
+# print(X_test[:5], X_train[:5])
 # print(f"{len(X_train)}, {len(y_train)}, {len(X_test)}, {len(y_test)}")
 
 
 def plot_predictions(train_data=X_train,
-                     train_labels=y_train,
+                     train_l1_labels=y_L1_train,
+                     train_l2_labels=y_L2_train,
+                     train_l3_labels=y_L3_train,
+                     train_l4_labels=y_L4_train,
+                     train_l5_labels=y_L5_train,
                      test_data=X_test,
-                     test_labels=y_test,
-                     predictions=None):
+                     test_l1_labels=y_L1_test,
+                     test_l2_labels=y_L2_test,
+                     test_l3_labels=y_L3_test,
+                     test_l4_labels=y_L4_test,
+                     test_l5_labels=y_L5_test,
+                     predictions_l1=None,
+                     predictions_l2=None,
+                     predictions_l3=None,
+                     predictions_l4=None,
+                     predictions_l5=None):
 
     """
     Plots training data, test data and compares predictions.
     """
-    plt.figure(figsize=(8, 6))
+    # plt.figure(figsize=(8, 6))
+    fig, (ax) = plt.subplots(figsize=(15, 6))
 
     # Plot training data in blue
-    plt.scatter(train_data, train_labels, c="b", s=6, label="Training data")
+    ax.plot(train_data, train_l1_labels, linestyle='none', color="blue", marker='o', markersize=2, label="L1")
+    ax.plot(train_data, train_l2_labels, linestyle='none', color="orange", marker='o', markersize=2, label="L2")
+    ax.plot(train_data, train_l3_labels, linestyle='none', color="green", marker='o', markersize=2, label="L3")
+    ax.plot(train_data, train_l4_labels, linestyle='none', color="gray", marker='o', markersize=2, label="L4")
+    ax.plot(train_data, train_l5_labels, linestyle='none', color="purple", marker='o', markersize=2, label="L5")
 
-    # Plot test data in green
-    plt.scatter(test_data, test_labels, c="g", s=6, label="Testing data")
+    # Plot test data
+    ax.plot(test_data, test_l1_labels, linestyle='none', color="blue", marker='x', markersize=3, label="L1_test")
+    ax.plot(test_data, test_l2_labels, linestyle='none', color="orange", marker='x', markersize=3, label="L2_test")
+    ax.plot(test_data, test_l3_labels, linestyle='none', color="green", marker='x', markersize=3, label="L3_test")
+    ax.plot(test_data, test_l4_labels, linestyle='none', color="gray", marker='x', markersize=3, label="L4_test")
+    ax.plot(test_data, test_l5_labels, linestyle='none', color="purple", marker='x', markersize=3, label="L5_test")
 
-    if predictions is not None:
-        # Plot the predictions in red (predictions were made on the test data)
-        plt.scatter(test_data, predictions, c="r", s=6, label="Predictions")
+    # # Plot the predictions of L1 to L5 if exists
+    if predictions_l1 is not None:
+        ax.plot(test_data, predictions_l1, linestyle='none', color="blue", marker='p', markersize=4, label="L1_pred")
+    if predictions_l2 is not None:
+        ax.plot(test_data, predictions_l2, linestyle='none', color="orange", marker='p', markersize=4, label="L2_pred")
+    if predictions_l3 is not None:
+        ax.plot(test_data, predictions_l3, linestyle='none', color="green", marker='p', markersize=4, label="L3_pred")
+    if predictions_l4 is not None:
+        ax.plot(test_data, predictions_l4, linestyle='none', color="gray", marker='p', markersize=4, label="L4_pred")
+    if predictions_l5 is not None:
+        ax.plot(test_data, predictions_l5, linestyle='none', color="purple", marker='p', markersize=4, label="L5_pred")
 
     # Show the legend
-    plt.legend(prop={"size": 10})
+    ax.legend(prop={"size": 10})
+    # Y axis limitations
+    plt.ylim([0, 45])
     plt.show()
 
 # ########################################################################################################
@@ -103,9 +151,10 @@ def plot_predictions(train_data=X_train,
 #     # Forward defines the computation in the model
 #     def forward(self, x: torch.Tensor) -> torch.Tensor:
 #         return self.weights * x + self.bias
-#
-#
+
+
 class NoLinearModel(nn.Module):
+
     def __init__(self):
         super().__init__()
         self.layer_1 = nn.Linear(in_features=1, out_features=25)
@@ -197,11 +246,11 @@ with torch.inference_mode():
     y_preds = model_0(X_test)
     # y_preds = y[train_split:]
 print(y_preds)
-plot_predictions(predictions=y_preds)
+plot_predictions(predictions_l1=y_preds)
 
 # Create the loss function
 # loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
-loss_fn = nn.MSELoss() # train loss 28.1, test loss 23.52
+loss_fn = nn.MSELoss()  # train loss 28.1, test loss 23.52
 # loss_fn = nn.CrossEntropyLoss() # train loss 0.0, test loss 0.0
 # loss_fn = nn.CTCLoss() # lack of parameters
 # loss_fn = nn.NLLLoss() # lack of parameters
@@ -229,8 +278,8 @@ optimizer = torch.optim.Adam(model_0.parameters())
 torch.manual_seed(42)
 
 # Set the number of epochs (how many times the model will pass over the training data)
-epochs = 1000
-
+# epochs = 2200
+epochs = 1500
 # Create empty loss lists to track values
 train_loss_values = []
 test_loss_values = []
@@ -248,7 +297,7 @@ for epoch in range(epochs):
     # print(y_pred)
 
     # 2. Calculate the loss (how different are our models predictions to the ground truth)
-    loss = loss_fn(y_pred, y_train)
+    loss = loss_fn(y_pred, y_L1_train)
 
     # 3. Zero grad of the optimizer
     optimizer.zero_grad()
@@ -270,9 +319,8 @@ for epoch in range(epochs):
         # test_pred, hnt = model_0(X_test.unsqueeze(dim=1))
         test_pred = model_0(X_test)
 
-
         # 2. Caculate loss on test data
-        test_loss = loss_fn(test_pred, y_test.type(torch.float))
+        test_loss = loss_fn(test_pred, y_L1_test.type(torch.float))
 
         # Print out what's happening
         if epoch % 100 == 0:
@@ -281,12 +329,7 @@ for epoch in range(epochs):
             test_loss_values.append(test_loss.detach().numpy())
             print(f"Epoch: {epoch} | MAE Train Loss: {loss} | MAE Test Loss: {test_loss} ")
 
-# Use the model to make predictions
-# input_sequence = torch.Tensor(list(range(10, 20))).view(10, 1, -1)
-input_sequence = torch.Tensor(X_test)
-output = model_0(input_sequence)
-prediction = output[-1].item()
-print(f'Predicted next number: {prediction:.2f}')
+
 
 # Plot the loss curves
 plt.plot(epoch_count, train_loss_values, label="Train loss")
@@ -296,3 +339,22 @@ plt.ylabel("Loss")
 plt.xlabel("Epochs")
 plt.legend()
 plt.show()
+
+# Find our model's learned parameters
+print("The model learned the following values for weights and bias:")
+# print(model_0.state_dict())
+
+model_0.eval()
+
+with torch.inference_mode():
+  y_preds = model_0(X_test)
+print(y_preds)
+
+plot_predictions(predictions_l1=y_preds)
+
+# Use the model to make predictions
+# input_sequence = torch.Tensor(list(range(10, 20))).view(10, 1, -1)
+input_sequence = torch.Tensor(X_test)
+output = model_0(input_sequence)
+prediction = output[-1].item()
+print(f'Predicted next number: {prediction:.2f}')

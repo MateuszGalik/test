@@ -170,8 +170,9 @@ class NoLinearModel(nn.Module):
     def forward(self, x):
         # return self.sigmoid(self.layer_5(self.layer_4(self.layer_3(self.layer_2(self.layer_1(x))))))
         x, _ = self.lstm(x)
-        x = self.sigmoid(self.layer_2(x))
-        x, _ = self.lstm2(x)
+        # x = self.sigmoid(self.layer_2(x))
+        # x, _ = self.lstm2(x)
+        # x = self.layer_3(x)
         x = self.layer_3(x)
         return x
 #
@@ -233,7 +234,11 @@ torch.manual_seed(42)
 
 # model_0 = NoLinearModel2(input_size=1, output_size=1, hidden_dim=200, n_layers=1)
 # model_0 = LSTMmodel(1, 32, 1)
-model_0 = NoLinearModel()
+model_L1 = NoLinearModel()
+model_L2 = NoLinearModel()
+model_L3 = NoLinearModel()
+model_L4 = NoLinearModel()
+model_L5 = NoLinearModel()
 
 # print("### Model 0 Parameters")
 # print(list(model_0.parameters()))
@@ -243,10 +248,18 @@ model_0 = NoLinearModel()
 # Make predictions with model
 with torch.inference_mode():
     # y_preds, hn = model_0(X_test.unsqueeze(dim=1))
-    y_preds = model_0(X_test)
+    y_L1_preds = model_L1(X_test)
+    y_L2_preds = model_L2(X_test)
+    y_L3_preds = model_L2(X_test)
+    y_L4_preds = model_L2(X_test)
+    y_L5_preds = model_L2(X_test)
     # y_preds = y[train_split:]
-print(y_preds)
-plot_predictions(predictions_l1=y_preds)
+# print(y_L1_preds)
+plot_predictions(predictions_l1=y_L1_preds,
+                 predictions_l2=y_L2_preds,
+                 predictions_l3=y_L3_preds,
+                 predictions_l4=y_L4_preds,
+                 predictions_l5=y_L5_preds)
 
 # Create the loss function
 # loss_fn = nn.L1Loss()  # train loss 4.06, test loss 3.8
@@ -274,66 +287,140 @@ loss_fn = nn.MSELoss()  # train loss 28.1, test loss 23.52
 # Create the optimizer
 # optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.01)
 # optimizer = torch.optim.SGD(model_0.parameters(), lr=0.01, momentum=0.9)
-optimizer = torch.optim.Adam(model_0.parameters())
+optimizer_L1 = torch.optim.Adam(model_L1.parameters())
+optimizer_L2 = torch.optim.Adam(model_L2.parameters())
+optimizer_L3 = torch.optim.Adam(model_L3.parameters())
+optimizer_L4 = torch.optim.Adam(model_L4.parameters())
+optimizer_L5 = torch.optim.Adam(model_L5.parameters())
+
 torch.manual_seed(42)
 
 # Set the number of epochs (how many times the model will pass over the training data)
 # epochs = 2200
 epochs = 1500
 # Create empty loss lists to track values
-train_loss_values = []
-test_loss_values = []
-epoch_count = []
+train_loss_values_L1 = []
+test_loss_values_L1 = []
+epoch_count_L1 = []
+
+train_loss_values_L2 = []
+test_loss_values_L2 = []
+epoch_count_L2 = []
+
+train_loss_values_L3 = []
+test_loss_values_L3 = []
+epoch_count_L3 = []
+
+train_loss_values_L4 = []
+test_loss_values_L4 = []
+epoch_count_L4 = []
+
+train_loss_values_L5 = []
+test_loss_values_L5 = []
+epoch_count_L5 = []
 
 for epoch in range(epochs):
     # Training
 
     # Put model in training mode (this is the default state of a model)
-    model_0.train()
+    model_L1.train()
+    model_L2.train()
+    model_L3.train()
+    model_L4.train()
+    model_L5.train()
 
     # 1. Forward pass on train data using the forward() method inside
-    y_pred = model_0(X_train)
+    y_L1_pred = model_L1(X_train)
+    y_L2_pred = model_L2(X_train)
+    y_L3_pred = model_L3(X_train)
+    y_L4_pred = model_L4(X_train)
+    y_L5_pred = model_L5(X_train)
+
     # y_pred, hn = model_0(X_train.unsqueeze(dim=1))
     # print(y_pred)
 
     # 2. Calculate the loss (how different are our models predictions to the ground truth)
-    loss = loss_fn(y_pred, y_L1_train)
+    loss_L1 = loss_fn(y_L1_pred, y_L1_train)
+    loss_L2 = loss_fn(y_L2_pred, y_L2_train)
+    loss_L3 = loss_fn(y_L3_pred, y_L3_train)
+    loss_L4 = loss_fn(y_L4_pred, y_L4_train)
+    loss_L5 = loss_fn(y_L5_pred, y_L5_train)
+
 
     # 3. Zero grad of the optimizer
-    optimizer.zero_grad()
+    optimizer_L1.zero_grad()
+    optimizer_L2.zero_grad()
+    optimizer_L3.zero_grad()
+    optimizer_L4.zero_grad()
+    optimizer_L5.zero_grad()
 
     # 4. Loss backwards
-    loss.backward()
+    loss_L1.backward()
+    loss_L2.backward()
+    loss_L3.backward()
+    loss_L4.backward()
+    loss_L5.backward()
 
     # 5. Progress the optimizer
-    optimizer.step()
+    optimizer_L1.step()
+    optimizer_L2.step()
+    optimizer_L3.step()
+    optimizer_L4.step()
+    optimizer_L5.step()
 
     # Testing
 
     # Put the model in evaluation mode
-    model_0.eval()
+    model_L1.eval()
+    model_L2.eval()
+    model_L3.eval()
+    model_L4.eval()
+    model_L5.eval()
 
     with torch.inference_mode():
 
         # 1. Forward pass on test data
         # test_pred, hnt = model_0(X_test.unsqueeze(dim=1))
-        test_pred = model_0(X_test)
+        test_pred_L1 = model_L1(X_test)
+        test_pred_L2 = model_L2(X_test)
+        test_pred_L3 = model_L3(X_test)
+        test_pred_L4 = model_L4(X_test)
+        test_pred_L5 = model_L5(X_test)
 
         # 2. Caculate loss on test data
-        test_loss = loss_fn(test_pred, y_L1_test.type(torch.float))
+        test_loss_L1 = loss_fn(test_pred_L1, y_L1_test.type(torch.float))
+        test_loss_L2 = loss_fn(test_pred_L2, y_L2_test.type(torch.float))
+        test_loss_L3 = loss_fn(test_pred_L3, y_L3_test.type(torch.float))
+        test_loss_L4 = loss_fn(test_pred_L4, y_L4_test.type(torch.float))
+        test_loss_L5 = loss_fn(test_pred_L5, y_L5_test.type(torch.float))
 
         # Print out what's happening
         if epoch % 100 == 0:
-            epoch_count.append(epoch)
-            train_loss_values.append(loss.detach().numpy())
-            test_loss_values.append(test_loss.detach().numpy())
-            print(f"Epoch: {epoch} | MAE Train Loss: {loss} | MAE Test Loss: {test_loss} ")
-
+            epoch_count_L1.append(epoch)
+            epoch_count_L2.append(epoch)
+            epoch_count_L3.append(epoch)
+            epoch_count_L4.append(epoch)
+            epoch_count_L5.append(epoch)
+            train_loss_values_L1.append(loss_L1.detach().numpy())
+            train_loss_values_L2.append(loss_L2.detach().numpy())
+            train_loss_values_L3.append(loss_L3.detach().numpy())
+            train_loss_values_L4.append(loss_L4.detach().numpy())
+            train_loss_values_L5.append(loss_L5.detach().numpy())
+            test_loss_values_L1.append(test_loss_L1.detach().numpy())
+            test_loss_values_L2.append(test_loss_L2.detach().numpy())
+            test_loss_values_L3.append(test_loss_L3.detach().numpy())
+            test_loss_values_L4.append(test_loss_L4.detach().numpy())
+            test_loss_values_L5.append(test_loss_L5.detach().numpy())
+            print(f"Epoch: {epoch} | MAE Train Loss L1: {loss_L1} | MAE Test Loss L1: {test_loss_L1} ")
+            print(f"Epoch: {epoch} | MAE Train Loss L2: {loss_L2} | MAE Test Loss L2: {test_loss_L2} ")
+            print(f"Epoch: {epoch} | MAE Train Loss L3: {loss_L3} | MAE Test Loss L3: {test_loss_L3} ")
+            print(f"Epoch: {epoch} | MAE Train Loss L4: {loss_L4} | MAE Test Loss L4: {test_loss_L4} ")
+            print(f"Epoch: {epoch} | MAE Train Loss L5: {loss_L5} | MAE Test Loss L5: {test_loss_L5} ")
 
 
 # Plot the loss curves
-plt.plot(epoch_count, train_loss_values, label="Train loss")
-plt.plot(epoch_count, test_loss_values, label="Test loss")
+plt.plot(epoch_count_L1, train_loss_values_L1, label="Train loss")
+plt.plot(epoch_count_L1, test_loss_values_L1, label="Test loss")
 plt.title("Training and test loss curves")
 plt.ylabel("Loss")
 plt.xlabel("Epochs")
@@ -344,17 +431,43 @@ plt.show()
 print("The model learned the following values for weights and bias:")
 # print(model_0.state_dict())
 
-model_0.eval()
+model_L1.eval()
+model_L2.eval()
+model_L3.eval()
+model_L4.eval()
+model_L5.eval()
 
 with torch.inference_mode():
-  y_preds = model_0(X_test)
-print(y_preds)
+  y_L1_preds = model_L1(X_test)
+  y_L2_preds = model_L2(X_test)
+  y_L3_preds = model_L3(X_test)
+  y_L4_preds = model_L4(X_test)
+  y_L5_preds = model_L5(X_test)
+# print(y_L1_preds, y_L2_preds)
 
-plot_predictions(predictions_l1=y_preds)
+
+plot_predictions(predictions_l1=y_L1_preds,
+                 predictions_l2=y_L2_preds,
+                 predictions_l3=y_L3_preds,
+                 predictions_l4=y_L4_preds,
+                 predictions_l5=y_L5_preds)
 
 # Use the model to make predictions
 # input_sequence = torch.Tensor(list(range(10, 20))).view(10, 1, -1)
 input_sequence = torch.Tensor(X_test)
-output = model_0(input_sequence)
-prediction = output[-1].item()
-print(f'Predicted next number: {prediction:.2f}')
+output_L1 = model_L1(input_sequence)
+output_L2 = model_L2(input_sequence)
+output_L3= model_L3(input_sequence)
+output_L4= model_L4(input_sequence)
+output_L5= model_L5(input_sequence)
+
+prediction_L1 = output_L1[-1].item()
+prediction_L2 = output_L2[-1].item()
+prediction_L3 = output_L3[-1].item()
+prediction_L4 = output_L4[-1].item()
+prediction_L5 = output_L5[-1].item()
+print(f'Predicted next number L1: {prediction_L1:.2f}')
+print(f'Predicted next number L2: {prediction_L2:.2f}')
+print(f'Predicted next number L3: {prediction_L3:.2f}')
+print(f'Predicted next number L4: {prediction_L4:.2f}')
+print(f'Predicted next number L5: {prediction_L5:.2f}')
